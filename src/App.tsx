@@ -32,7 +32,7 @@ function App() {
       <h3>Nuclear Detonations</h3>
       <div className='map-wrapper'>
         <APIProvider
-          apiKey={'AIzaSyDmiveSC5ErwBJs_E1XdMHKHZQFbXoR8Yc'}
+          apiKey={'put-api-key-here'}
           onLoad={() => console.log('Maps API has loaded')}
         >
           <Map
