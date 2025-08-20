@@ -1,15 +1,15 @@
 import { useEffect, useMemo, useState } from 'react'
 import './App.css'
-import type { nuclearDetonation } from './dataModels/nuclearDetonation';
-import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
+import type { NuclearDetonation } from './interfaces/NuclearDetonation';
+import { APIProvider, Map } from '@vis.gl/react-google-maps';
+import MapMarkers from './components/MapMarkers/MapMarkers';
 
 function App() {
-  const [detonationData, setDetonationData] = useState<nuclearDetonation[]>([]);
+  const [detonationData, setDetonationData] = useState<NuclearDetonation[]>([]);
 
   // Table paging
   const [pageNumber, setPageNumber] = useState<number>(0);
-  const [pageSize, setPageSize] = useState<number>(10);
+  const [pageSize, setPageSize] = useState<number>(10000);
 
   const selectedDetonations = useMemo(() =>
     detonationData.slice(pageNumber * pageSize, (pageNumber * pageSize) + pageSize)
@@ -31,25 +31,20 @@ function App() {
     <>
       <h3>Nuclear Detonations</h3>
       <div className='map-wrapper'>
-        <MapContainer
-          className='map-container'
-          center={[0, 0]}
-          zoom={2}
-          scrollWheelZoom={false}
+        <APIProvider
+          apiKey={'AIzaSyDmiveSC5ErwBJs_E1XdMHKHZQFbXoR8Yc'}
+          onLoad={() => console.log('Maps API has loaded')}
         >
-          <TileLayer
-            className='tile-layer'
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
-          {selectedDetonations && selectedDetonations.map(detonation =>
-            <Marker position={[detonation.latitude, detonation.longitude]}>
-              <Popup>
-                {detonation.detonationYear} - {detonation.detonatedBy} - {detonation.upperYield} kilotons - {detonation.depth} depth
-              </Popup>
-            </Marker>
-          )}
-        </MapContainer>
+          <Map
+            defaultZoom={2}
+            defaultCenter={{ lat: 0, lng: 0 }}
+            mapTypeId={'satellite'}
+            mapId={'map'}
+            zoomControl={true}
+          >
+            <MapMarkers pointsOfInterest={selectedDetonations} />
+          </Map>
+        </APIProvider>
       </div>
       <div className='table-container'>
         <div className='paging-container'>
@@ -69,14 +64,16 @@ function App() {
         </div>
         <table>
           <thead>
-            <th>Country</th>
-            <th>Year</th>
-            <th>Coordinates</th>
-            <th>Yield</th>
+            <tr>
+              <th>Country</th>
+              <th>Year</th>
+              <th>Coordinates</th>
+              <th>Yield</th>
+            </tr>
           </thead>
           <tbody>
             {selectedDetonations && selectedDetonations.map(detonation =>
-              <tr>
+              <tr key={crypto.randomUUID()}>
                 <td>{detonation.detonatedBy}</td>
                 <td>{detonation.detonationYear}</td>
                 <td>({detonation.latitude}, {detonation.longitude})</td>

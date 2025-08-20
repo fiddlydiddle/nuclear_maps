@@ -1,4 +1,5 @@
-export interface nuclearDetonation {
+export interface NuclearDetonation {
+    id: number
     detonatedBy: string
     detonatedIn: string
     dataSource: string
